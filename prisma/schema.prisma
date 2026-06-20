@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Profile {
+  id String @id @default(uuid()) @db.Uuid
+  full_name String
+  email String @unique
+  password String
+  avatar_url String?
+  create_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  folders Folders[]
+  notes Notes[]
+}
+
+model Folders {
+  id String @id @default(uuid()) @db.Uuid
+  name String @unique
+  color String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  status String
+
+  notes Notes[]
+
+  user_id String @db.Uuid
+  profile Profile @relation(fields: [user_id], references: [id])
+}
+
+model Notes {
+  id String @id @default(uuid()) @db.Uuid
+  title String @unique
+  content String
+  color String
+  tags String[]
+  status Int
+  is_pinned Boolean @default(false)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  user_id String @db.Uuid
+  profile Profile @relation(fields: [user_id], references: [id])
+
+  folder_id String? @db.Uuid
+  folder Folders? @relation(fields: [folder_id], references: [id])
+}
